@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catanduanes State University Steps</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="back-button-container">
+            <button class="back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i></button>
+        </div>
+        <h1>Admission</h1>
+        <div class="steps">
+            <button onclick="showForm('application')">Step 1: APPLICATION FORM</button>
+            <button onclick="showForm('catcut-fee')">Step 2: CATCUCAT FEE</button>
+            <button onclick="showForm('application-result')">Step 3: APPLICATION RESULT</button>
+        </div>
+    </div>
+    <script>
+        function goBack() {
+            window.location.href = 'index.html'; // Change this to your main page filename
+        }
+
+        function showForm(formType) {
+            if (formType === 'application') {
+                window.location.href = 'application-form.html';
+            } else if (formType === 'catcut-fee') {
+                window.location.href = 'payment.html'; // Redirect to step2.html
+            
+            } else if (formType === 'application-result') {
+                window.location.href = 'result.html'; // Redirect to step3.html
+            }
+        }
+    </script>
+</body>
+</html>

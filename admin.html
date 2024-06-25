@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://hvqvmxakmursjidtfmdj.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cXZteGFrbXVyc2ppZHRmbWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg2MDA4MjQsImV4cCI6MjAzNDE3NjgyNH0.dykJM61G-58LEnAyCUU6-irano2f4vraV8t1l8C5KZ8';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function fetchStudents() {
+            const { data, error } = await supabase
+                .from('admissions')
+                .select('*');
+
+            if (error) {
+                console.error('Error fetching students:', error);
+                return;
+            }
+
+            const studentsList = document.getElementById('students-list');
+            studentsList.innerHTML = '';
+
+            data.forEach(student => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${student.given_name} ${student.last_name}`;
+                listItem.classList.add('cursor-pointer', 'text-blue-500', 'hover:underline');
+                listItem.addEventListener('click', () => showStudentDetails(student));
+                studentsList.appendChild(listItem);
+            });
+        }
+
+        function showStudentDetails(student) {
+            const studentsList = document.getElementById('students-list');
+            studentsList.style.display = 'none';
+            
+            const studentDetails = document.getElementById('student-details');
+            studentDetails.innerHTML = `
+                <h1 class="font-semibold text-center text-xl mb-4"> Applying for: ${student.admission_type} education</h1>
+                    <p><strong>Applicants Name:</strong> ${student.given_name} ${student.last_name}</p>
+
+                <p><strong>Application Type:</strong> ${student.admission_type}</p>
+                <p><strong>Middle Name:</strong> ${student.middle_name}</p>
+                <p><strong>Address:</strong> ${student.address}</p>
+                <p><strong>Username:</strong> ${student.username}</p>
+                <p><strong>Password:</strong> ${student.password}</p>
+                <p><strong>Created At:</strong> ${new Date(student.created_at).toLocaleString()}</p>
+                <button class=" items-center mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700" onclick="backToList()">Back to List</button>
+            `;
+        }
+
+        function backToList() {
+            const studentDetails = document.getElementById('student-details');
+            studentDetails.innerHTML = '';
+            
+            const studentsList = document.getElementById('students-list');
+            studentsList.style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchStudents);
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CATSU Online Admission System Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="container max-w-2xl mx-auto p-8 bg-white shadow-md rounded-lg">
+        <h1 class="text-2xl font-bold text-center mb-4">CATSU Online Admission System Admin</h1>
+        <ul id="students-list" class="list-disc list-inside"></ul>
+        <div id="student-details" class="mt-6"></div>
+    </div>
+</body>
+</html>

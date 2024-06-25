@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>   
+        const SUPABASE_URL = 'https://hvqvmxakmursjidtfmdj.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cXZteGFrbXVyc2ppZHRmbWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg2MDA4MjQsImV4cCI6MjAzNDE3NjgyNH0.dykJM61G-58LEnAyCUU6-irano2f4vraV8t1l8C5KZ8';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catanduanes State University Admission</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <img src="catsu.png" alt="Catanduanes State University" class="school-image">
+        <h1>Catanduanes State University</h1>
+        <h2>Online Admission System</h2>
+        <p>Applying for:</p>
+        <div class="buttons">
+            <button onclick="showForm('elementary')">Elementary</button>
+            <button onclick="showForm('junior')">Junior High School</button>
+            <button onclick="showForm('senior')">Senior High School</button>
+            <button onclick="showForm('higher')">Higher Education</button>
+        </div>
+        <div id="form-container" class="form-container"></div>
+        <button id="login-page-button" onclick="showLoginForm()">Login</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Form - Catanduanes State University</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>   
+        const SUPABASE_URL = 'https://hvqvmxakmursjidtfmdj.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cXZteGFrbXVyc2ppZHRmbWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg2MDA4MjQsImV4cCI6MjAzNDE3NjgyNH0.dykJM61G-58LEnAyCUU6-irano2f4vraV8t1l8C5KZ8';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        async function autoFillForm() {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (!userData) return;
+            
+            const {
+                given_name, middle_name, last_name, mother_name, mother_occupation,
+                contact_number, guardian, address, strand, applicant_type, school,
+                email, course
+            } = userData;
+
+            document.getElementById('given-name').value = given_name || '';
+            document.getElementById('middle-name').value = middle_name || '';
+            document.getElementById('last-name').value = last_name || '';
+            document.getElementById('mother-name').value = mother_name || '';
+            document.getElementById('mother-occupation').value = mother_occupation || '';
+            document.getElementById('contact-number').value = contact_number || '';
+            document.getElementById('guardian').value = guardian || '';
+            document.getElementById('address').value = address || '';
+
+            const strandElement = document.getElementById('strand');
+            if (strand && strandElement) strandElement.value = strand;
+
+            const applicantTypeElement = document.getElementById('applicant-type');
+            if (applicant_type && applicantTypeElement) applicantTypeElement.value = applicant_type;
+
+            document.getElementById('school').value = school || '';
+            document.getElementById('email').value = email || '';
+            document.getElementById('course').value = course || '';
+        }
+
+        document.addEventListener('DOMContentLoaded', autoFillForm);
+    </script>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-4xl mx-auto bg-white p-8 mt-10 rounded-lg shadow-lg">
+        <div class="flex justify-between items-center mb-4">
+            <button class="text-purple-500 bg-white px-4 py-2 rounded-full hover:bg-white hover:text-purple-600 focus:outline-none" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> 
+            </button>
+            <h1 class="text-3xl font-bold text-center text-purple-500 flex-grow">Application Form</h1>
+        </div>
+        <div x-data="formHandler()">
+            <nav class="flex mb-6">
+                <button @click="tab = 'personal'" :class="{'border-indigo-500 text-indigo-600': tab === 'personal'}" class="px-4 py-2 font-semibold text-gray-700 hover:text-indigo-600 border-b-4 border-transparent focus:outline-none">Personal Information</button>
+                <button @click="tab = 'contact'" :class="{'border-indigo-500 text-indigo-600': tab === 'contact'}" class="ml-4 px-4 py-2 font-semibold text-gray-700 hover:text-indigo-600 border-b-4 border-transparent focus:outline-none">Contact Information</button>
+                <button @click="tab = 'academic'" :class="{'border-indigo-500 text-indigo-600': tab === 'academic'}" class="ml-4 px-4 py-2 font-semibold text-gray-700 hover:text-indigo-600 border-b-4 border-transparent focus:outline-none">Academic Preference</button>
+                <button @click="tab = 'education'" :class="{'border-indigo-500 text-indigo-600': tab === 'education'}" class="ml-4 px-4 py-2 font-semibold text-gray-700 hover:text-indigo-600 border-b-4 border-transparent focus:outline-none">Education Information</button>
+                <button @click="tab = 'admission'" :class="{'border-indigo-500 text-indigo-600': tab === 'admission'}" class="ml-4 px-4 py-2 font-semibold text-gray-700 hover:text-indigo-600 border-b-4 border-transparent focus:outline-none">Admission Requirements</button>
+                <button @click="tab = 'submission'; compileForm()" :class="{'border-indigo-500 text-indigo-600': tab === 'submission'}" class="ml-4 px-4 py-2 font-semibold text-gray-700 hover:text-indigo-600 border-b-4 border-transparent focus:outline-none">Submission</button>
+            </nav>
+            
+            <div x-show="tab === 'personal'">
+                <form @input="updateForm('personal')">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="adcon-number" class="block text-sm font-medium text-gray-700">Adcon Number</label>
+                            <input type="text" id="adcon-number" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.adconNumber">
+                        </div>
+                        <div>
+                            <label for="last-name" class="block text-sm font-medium text-gray-700">Last Name</label>
+                            <input type="text" id="last-name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.lastName">
+                        </div>
+                        <div>
+                            <label for="first-name" class="block text-sm font-medium text-gray-700">First Name</label>
+                            <input type="text" id="first-name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.firstName">
+                        </div>
+                        <div>
+                            <label for="middle-name" class="block text-sm font-medium text-gray-700">Middle Name</label>
+                            <input type="text" id="middle-name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.middleName">
+                        </div>
+                        <div>
+                            <label for="suffix" class="block text-sm font-medium text-gray-700">Suffix</label>
+                            <input type="text" id="suffix" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.suffix">
+                        </div>
+                        <div>
+                            <label for="gender" class="block text-sm font-medium text-gray-700">Gender</label>
+                            <select id="gender" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.gender">
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="marital-status" class="block text-sm font-medium text-gray-700">Marital Status</label>
+                            <select id="marital-status" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.maritalStatus">
+                                <option value="">Select Marital Status</option>
+                                <option value="single">Single</option>
+                                <option value="married">Married</option>
+                                <option value="widowed">Widowed</option>
+                                <option value="divorced">Divorced</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="date-of-birth" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                            <input type="date" id="date-of-birth" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.dateOfBirth">
+                        </div>
+                        <div>
+                            <label for="place-of-birth" class="block text-sm font-medium text-gray-700">Place of Birth</label>
+                            <input type="text" id="place-of-birth" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.placeOfBirth">
+                        </div>
+                        <div>
+                            <label for="country-of-birth" class="block text-sm font-medium text-gray-700">Country of Birth</label>
+                            <select id="country-of-birth" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.countryOfBirth">
+                                <option value="">Select Country</option>
+                                <!-- Add country options here -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="country-of-nationality" class="block text-sm font-medium text-gray-700">Country of Nationality</label>
+                            <select id="country-of-nationality" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.countryOfNationality">
+                                <option value="">Select Country</option>
+                                <!-- Add country options here -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="religious-affiliation" class="block text-sm font-medium text-gray-700">Religious Affiliation</label>
+                            <input type="text" id="religious-affiliation" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.religiousAffiliation">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">International / Foreign Student?</label>
+                            <div class="mt-1 flex items-center">
+                                <input type="checkbox" id="foreign-student" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" x-model="personal.foreignStudent">
+                                <label for="foreign-student" class="ml-2 block text-sm text-gray-900">Yes</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="lrn" class="block text-sm font-medium text-gray-700">LRN</label>
+                            <input type="text" id="lrn" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.lrn">
+                        </div>
+                        <div>
+                            <label for="language-spoken" class="block text-sm font-medium text-gray-700">Language Spoken</label>
+                            <input type="text" id="language-spoken" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.languageSpoken">
+                        </div>
+                        <div>
+                            <label for="foreign-language-spoken" class="block text-sm font-medium text-gray-700">Foreign Language Spoken</label>
+                            <input type="text" id="foreign-language-spoken" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="personal.foreignLanguageSpoken">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Working Student?</label>
+                            <div class="mt-1 flex items-center">
+                                <input type="checkbox" id="working-student" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" x-model="personal.workingStudent">
+                                <label for="working-student" class="ml-2 block text-sm text-gray-900">Yes</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="photo" class="block text-sm font-medium text-gray-700">Photo</label>
+                            <input type="file" id="photo" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" @change="updatePhoto">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div x-show="tab === 'contact'">
+                <form @input="updateForm('contact')">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="mobile-number" class="block text-sm font-medium text-gray-700">Mobile Number</label>
+                            <input type="text" id="mobile-number" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="contact.mobileNumber">
+                        </div>
+                        <div>
+                            <label for="telephone-number" class="block text-sm font-medium text-gray-700">Telephone Number</label>
+                            <input type="text" id="telephone-number" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="contact.telephoneNumber">
+                        </div>
+                        <div>
+                            <label for="present-address" class="block text-sm font-medium text-gray-700">Present Address</label>
+                            <input type="text" id="present-address" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="contact.presentAddress">
+                        </div>
+                        <div>
+                            <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+                            <select id="country" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="contact.country">
+                                <option value="">Select Country</option>
+                                <!-- Add country options here -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="province" class="block text-sm font-medium text-gray-700">Province</label>
+                            <input type="text" id="province" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="contact.province">
+                        </div>
+                        <div>
+                            <label for="city" class="block text-sm font-medium text-gray-700">City</label>
+                            <input type="text" id="city" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="contact.city">
+                        </div>
+                        <div>
+                            <label for="barangay" class="block text-sm font-medium text-gray-700">Barangay</label>
+                            <input type="text" id="barangay" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="contact.barangay">
+                        </div>
+                        <div>
+                            <label for="zip-code" class="block text-sm font-medium text-gray-700">Zip Code</label>
+                            <input type="text" id="zip-code" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="contact.zipCode">
+                        </div>
+                        <div>
+                            <label for="permanent-address" class="block text-sm font-medium text-gray-700">Permanent Address</label>
+                            <input type="text" id="permanent-address" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="contact.permanentAddress">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Same as Present Address?</label>
+                            <div class="mt-1 flex items-center">
+                                <input type="checkbox" id="same-as-present" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" x-model="contact.sameAsPresent">
+                                <label for="same-as-present" class="ml-2 block text-sm text-gray-900">Yes</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div x-show="tab === 'academic'">
+                <form @input="updateForm('academic')">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="program" class="block text-sm font-medium text-gray-700">Program or Department Affiliation</label>
+                            <select id="program" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="academic.program">
+                                <option value="">Select Program</option>
+                                <!-- Add program options here -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="preferred-campus" class="block text-sm font-medium text-gray-700">Preferred Campus</label>
+                            <input type="text" id="preferred-campus" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="academic.preferredCampus">
+                        </div>
+                        <div>
+                            <label for="preferred-term" class="block text-sm font-medium text-gray-700">Preferred Term</label>
+                            <select id="preferred-term" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="academic.preferredTerm">
+                                <option value="">Select Term</option>
+                                <!-- Add term options here -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="preferred-year-level" class="block text-sm font-medium text-gray-700">Preferred Year Level</label>
+                            <select id="preferred-year-level" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="academic.preferredYearLevel">
+                                <option value="">Select Year Level</option>
+                                <!-- Add year level options here -->
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div x-show="tab === 'education'">
+                <form @input="updateForm('education')">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="high-school" class="block text-sm font-medium text-gray-700">High School</label>
+                            <input type="text" id="high-school" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="education.highSchool">
+                        </div>
+                        <div>
+                            <label for="high-school-year" class="block text-sm font-medium text-gray-700">Year Graduated from High School</label>
+                            <input type="text" id="high-school-year" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="education.highSchoolYear">
+                        </div>
+                        <div>
+                            <label for="college" class="block text-sm font-medium text-gray-700">College</label>
+                            <input type="text" id="college" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="education.college">
+                        </div>
+                        <div>
+                            <label for="college-year" class="block text-sm font-medium text-gray-700">Year Graduated from College</label>
+                            <input type="text" id="college-year" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="education.collegeYear">
+                        </div>
+                        <div>
+                            <label for="degree" class="block text-sm font-medium text-gray-700">Degree Earned</label>
+                            <input type="text" id="degree" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="education.degree">
+                        </div>
+                        <div>
+                            <label for="graduate-school" class="block text-sm font-medium text-gray-700">Graduate School</label>
+                            <input type="text" id="graduate-school" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="education.graduateSchool">
+                        </div>
+                        <div>
+                            <label for="graduate-school-year" class="block text-sm font-medium text-gray-700">Year Graduated from Graduate School</label>
+                            <input type="text" id="graduate-school-year" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="education.graduateSchoolYear">
+                        </div>
+                        <div>
+                            <label for="graduate-degree" class="block text-sm font-medium text-gray-700">Graduate Degree Earned</label>
+                            <input type="text" id="graduate-degree" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" x-model="education.graduateDegree">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div x-show="tab === 'admission'">
+                <form @input="updateForm('admission')">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="tor" class="block text-sm font-medium text-gray-700">Transcript of Records (TOR)</label>
+                            <input type="file" id="tor" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" @change="updateTor">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div x-show="tab === 'submission'">
+                <form>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Displaying all information from previous tabs -->
+                        <!-- Personal Information -->
+                        <div class="border p-4 rounded-md">
+                            <h2 class="text-lg font-semibold text-gray-900">Personal Information</h2>
+                            <p class="text-sm text-gray-700 mt-2"><strong>Adcon Number:</strong> <span x-text="personal.adconNumber"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Last Name:</strong> <span x-text="personal.lastName"></span></p>
+                            <p class="text-sm text-gray-700"><strong>First Name:</strong> <span x-text="personal.firstName"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Middle Name:</strong> <span x-text="personal.middleName"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Suffix:</strong> <span x-text="personal.suffix"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Gender:</strong> <span x-text="personal.gender"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Marital Status:</strong> <span x-text="personal.maritalStatus"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Date of Birth:</strong> <span x-text="personal.dateOfBirth"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Place of Birth:</strong> <span x-text="personal.placeOfBirth"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Country of Birth:</strong> <span x-text="personal.countryOfBirth"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Country of Nationality:</strong> <span x-text="personal.countryOfNationality"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Religious Affiliation:</strong> <span x-text="personal.religiousAffiliation"></span></p>
+                            <p class="text-sm text-gray-700"><strong>International/Foreign Student:</strong> <span x-text="personal.foreignStudent ? 'Yes' : 'No'"></span></p>
+                            <p class="text-sm text-gray-700"><strong>LRN:</strong> <span x-text="personal.lrn"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Language Spoken:</strong> <span x-text="personal.languageSpoken"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Foreign Language Spoken:</strong> <span x-text="personal.foreignLanguageSpoken"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Working Student:</strong> <span x-text="personal.workingStudent ? 'Yes' : 'No'"></span></p>
+                        </div>
+                        <!-- Contact Information -->
+                        <div class="border p-4 rounded-md">
+                            <h2 class="text-lg font-semibold text-gray-900">Contact Information</h2>
+                            <p class="text-sm text-gray-700 mt-2"><strong>Mobile Number:</strong> <span x-text="contact.mobileNumber"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Telephone Number:</strong> <span x-text="contact.telephoneNumber"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Present Address:</strong> <span x-text="contact.presentAddress"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Country:</strong> <span x-text="contact.country"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Province:</strong> <span x-text="contact.province"></span></p>
+                            <p class="text-sm text-gray-700"><strong>City:</strong> <span x-text="contact.city"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Barangay:</strong> <span x-text="contact.barangay"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Zip Code:</strong> <span x-text="contact.zipCode"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Permanent Address:</strong> <span x-text="contact.permanentAddress"></span></p>
+                        </div>
+                        <!-- Academic Preference -->
+                        <div class="border p-4 rounded-md">
+                            <h2 class="text-lg font-semibold text-gray-900">Academic Preference</h2>
+                            <p class="text-sm text-gray-700 mt-2"><strong>Program or Department Affiliation:</strong> <span x-text="academic.program"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Preferred Campus:</strong> <span x-text="academic.preferredCampus"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Preferred Term:</strong> <span x-text="academic.preferredTerm"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Preferred Year Level:</strong> <span x-text="academic.preferredYearLevel"></span></p>
+                        </div>
+                        <!-- Education Information -->
+                        <div class="border p-4 rounded-md">
+                            <h2 class="text-lg font-semibold text-gray-900">Education Information</h2>
+                            <p class="text-sm text-gray-700 mt-2"><strong>High School:</strong> <span x-text="education.highSchool"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Year Graduated from High School:</strong> <span x-text="education.highSchoolYear"></span></p>
+                            <p class="text-sm text-gray-700"><strong>College:</strong> <span x-text="education.college"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Year Graduated from College:</strong> <span x-text="education.collegeYear"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Degree Earned:</strong> <span x-text="education.degree"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Graduate School:</strong> <span x-text="education.graduateSchool"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Year Graduated from Graduate School:</strong> <span x-text="education.graduateSchoolYear"></span></p>
+                            <p class="text-sm text-gray-700"><strong>Graduate Degree Earned:</strong> <span x-text="education.graduateDegree"></span></p>
+                        </div>
+                        <!-- Admission Requirements -->
+                        <div class="border p-4 rounded-md">
+                            <h2 class="text-lg font-semibold text-gray-900">Admission Requirements</h2>
+                            <p class="text-sm text-gray-700 mt-2"><strong>Transcript of Records (TOR):</strong> <span x-text="admission.torName"></span></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="mt-6 text-right">
+            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Submit
+            </button>
+        </div>
+    </div>
+
+    <script>
+
+function goBack() {
+            window.location.href = 'index.html'; // Change this to your main page filename
+        }
+        function formHandler() {
+            return {
+                tab: 'personal',
+                personal: {
+                    adconNumber: '',
+                    lastName: '',
+                    firstName: '',
+                    middleName: '',
+                    suffix: '',
+                    gender: '',
+                    maritalStatus: '',
+                    dateOfBirth: '',
+                    placeOfBirth: '',
+                    countryOfBirth: '',
+                    countryOfNationality: '',
+                    religiousAffiliation: '',
+                    foreignStudent: false,
+                    lrn: '',
+                    languageSpoken: '',
+                    foreignLanguageSpoken: '',
+                    workingStudent: false
+                },
+                contact: {
+                    mobileNumber: '',
+                    telephoneNumber: '',
+                    presentAddress: '',
+                    country: '',
+                    province: '',
+                    city: '',
+                    barangay: '',
+                    zipCode: '',
+                    permanentAddress: '',
+                    sameAsPresent: false
+                },
+                academic: {
+                    program: '',
+                    preferredCampus: '',
+                    preferredTerm: '',
+                    preferredYearLevel: ''
+                },
+                education: {
+                    highSchool: '',
+                    highSchoolYear: '',
+                    college: '',
+                    collegeYear: '',
+                    degree: '',
+                    graduateSchool: '',
+                    graduateSchoolYear: '',
+                    graduateDegree: ''
+                },
+                admission: {
+                    tor: null,
+                    torName: ''
+                },
+                updateForm(section) {
+                    if (section === 'contact' && this.contact.sameAsPresent) {
+                        this.contact.permanentAddress = this.contact.presentAddress;
+                    }
+                },
+                updatePhoto(event) {
+                    const file = event.target.files[0];
+                    this.personal.photo = file ? file.name : '';
+                },
+                updateTor(event) {
+                    const file = event.target.files[0];
+                    this.admission.tor = file;
+                    this.admission.torName = file ? file.name : '';
+                },
+                compileForm() {
+                    // This function compiles form data to display in the submission tab
+                }
+            }
+
+            
+        
+
+        }
+    </script>
+</body>
+</html>
